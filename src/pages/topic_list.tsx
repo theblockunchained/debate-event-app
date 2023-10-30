@@ -22,7 +22,7 @@ export default function TopicList() {
 
   return (
     <div>
-      <h2>All Topics</h2>
+      <h1>All Topics</h1>
       <ul>
         {topics.map((topic, index) => (
           <li key={index}>{topic.topic_name}</li>

@@ -28,8 +28,11 @@ body {
 
 button{
   color:white;
-  background:purple;
 }
+
+.purple{
+    background:purple;
+  }
 
 h1,h2{
     margin-bottom:30px;
@@ -38,3 +41,7 @@ h1,h2{
 .black{
     background: black;
 }
+
+div {
+    margin-top: 10px;
+  }

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Auth } from '@supabase/auth-ui-react';
 import { AuthContext } from '../contexts/auth';
 import TopicList from './topic_list';
+import DebateRating from './DebateRating'; 
 import './index.css';
 import { Button } from '@material-tailwind/react';
 
@@ -15,39 +16,43 @@ export default function HomePage() {
   const [events, setEvents] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [newEventName, setNewEventName] = useState('');
+  const [debates, setDebates] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
-      const { data, error } = await supabase.from('events').select('*');
-      if (data) {
-        setEvents(data);
-        setCurrentEvent(data[0]);
-      }
-      if (error) console.error('Error fetching events:', error);
-    }
-    fetchData();
+    fetchEvents();
   }, []);
 
   useEffect(() => {
-    async function fetchData() {
-      if (!currentEvent) return;
-
-      console.log('Fetching topics for event ID:', currentEvent.id);
-
-      const { data, error } = await supabase.from('topics').select('*').filter('event_id', 'eq', currentEvent.id);
-      if (data) {
-        console.log('Fetched topics:', data);
-        setTopics(data);
-      }
-      if (error) console.error('Error fetching topics:', error);
-    }
-    fetchData();
+    fetchTopicsForCurrentEvent();
   }, [currentEvent]);
+
+  const handleDebateRatingSubmission = (selectedDebate, criteriaScores) => {
+    // Here, you will send the data to the database (for example, using supabase).
+    // This will involve inserting the data into the Rating table.
+  };
 
   const fetchEvents = async () => {
     const { data, error } = await supabase.from('events').select('*');
-    if (data) setEvents(data);
+    if (data) {
+      setEvents(data);
+      if (!currentEvent) {
+        setCurrentEvent(data[0]);
+      }
+    }
     if (error) console.error('Error fetching events:', error);
+  };
+
+  const fetchTopicsForCurrentEvent = async () => {
+    if (!currentEvent) return;
+
+    console.log('Fetching topics for event ID:', currentEvent.id);
+
+    const { data, error } = await supabase.from('topics').select('*').filter('event_id', 'eq', currentEvent.id);
+    if (data) {
+      console.log('Fetched topics:', data);
+      setTopics(data);
+    }
+    if (error) console.error('Error fetching topics:', error);
   };
 
   const handleTopicSubmission = async () => {
@@ -113,7 +118,7 @@ export default function HomePage() {
                 </option>
               ))}
             </select>
-            <button className="black rounded px-2 py-1 ml-2" onClick={signOut}>Logout</button>
+            <Button className="black rounded px-2 py-1 ml-2" color="black" onClick={signOut}>Logout</Button>
           </div>
 
           <div className="mt-4">
@@ -123,20 +128,20 @@ export default function HomePage() {
               onChange={(e) => setNewEventName(e.target.value)} 
               placeholder="New Event Name"
             />
-            <button className="black rounded px-2 py-1" onClick={handleCreateEvent}>Create Event</button>
+            <Button className="black rounded px-2 py-1" color="black" onClick={handleCreateEvent}>Create Event</Button>
           </div>
 
           {currentEvent && (
             <div className="mt-4">
               <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
-              <button className="black rounded px-2 py-1" onClick={handleTopicSubmission}>Submit</button>
+              <Button className="black rounded px-2 py-1" color="black" onClick={handleTopicSubmission}>Submit</Button>
 
               <h2 className="text-2xl font-bold mt-4">Topics for {currentEvent.name}</h2>
               <ul className="list-disc list-inside">
                 {topics.map(topic => (
                   <li key={topic.id} className="mt-2">
                     {topic.topic_name} - Votes: {topic.votes}
-                    <button className="bg-aqua text-purple rounded px-2 py-1 ml-2" onClick={() => handleVote(topic.id)}>Vote</button>
+                    <Button className="purple rounded px-2 py-1 ml-2" color="aqua" text="purple" onClick={() => handleVote(topic.id)}>Vote</Button>
                   </li>
                 ))}
               </ul>
@@ -144,8 +149,9 @@ export default function HomePage() {
           )}
         </>
       )}
-      <TopicList />
+      <DebateRating debates={debates} onSubmit={handleDebateRatingSubmission} />
+     
     </div>
   );
-
 }
+
