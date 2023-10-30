@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import { Auth } from '@supabase/auth-ui-react';
 import { AuthContext } from '../contexts/auth';
 import TopicList from './topic_list';
+import './index.css';
+import { Button } from '@material-tailwind/react';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
@@ -90,15 +92,16 @@ export default function HomePage() {
   };
 
   return (
-    <div>
-      <h1>Welcome to the Debate Judging App!</h1>
+    <div className="bg-purple text-aqua p-4">
+      <h1 className="text-4xl font-bold">Welcome to the Debate Judging App!</h1>
       {!user ? (
         <Auth supabaseClient={supabase} providers={['google', 'github']} />
       ) : (
         <>
           <div>
-            <label>Select Event: </label>
+            <label className="mr-2">Select Event: </label>
             <select 
+              className="border border-aqua rounded p-1" 
               value={currentEvent?.id || ''} 
               onChange={(e) => {
                 const eventId = parseInt(e.target.value, 10);
@@ -110,29 +113,30 @@ export default function HomePage() {
                 </option>
               ))}
             </select>
-            <button onClick={signOut}>Logout</button>
+            <button className="black rounded px-2 py-1 ml-2" onClick={signOut}>Logout</button>
           </div>
 
-          <div>
+          <div className="mt-4">
             <input 
+              className="border border-aqua rounded p-1 mr-2" 
               value={newEventName} 
               onChange={(e) => setNewEventName(e.target.value)} 
               placeholder="New Event Name"
             />
-            <button onClick={handleCreateEvent}>Create Event</button>
+            <button className="black rounded px-2 py-1" onClick={handleCreateEvent}>Create Event</button>
           </div>
 
           {currentEvent && (
-            <div>
-              <input value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
-              <button onClick={handleTopicSubmission}>Submit</button>
+            <div className="mt-4">
+              <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
+              <button className="black rounded px-2 py-1" onClick={handleTopicSubmission}>Submit</button>
 
-              <h2>Topics for {currentEvent.name}</h2>
-              <ul>
+              <h2 className="text-2xl font-bold mt-4">Topics for {currentEvent.name}</h2>
+              <ul className="list-disc list-inside">
                 {topics.map(topic => (
-                  <li key={topic.id}>
+                  <li key={topic.id} className="mt-2">
                     {topic.topic_name} - Votes: {topic.votes}
-                    <button onClick={() => handleVote(topic.id)}>Vote</button>
+                    <button className="bg-aqua text-purple rounded px-2 py-1 ml-2" onClick={() => handleVote(topic.id)}>Vote</button>
                   </li>
                 ))}
               </ul>
@@ -145,6 +149,3 @@ export default function HomePage() {
   );
 
 }
-
-
-

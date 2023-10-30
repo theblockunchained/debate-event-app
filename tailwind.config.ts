@@ -1,6 +1,7 @@
-import type { Config } from 'tailwindcss'
+import { TailwindConfig } from 'tailwindcss/types/config';
+import colors from 'tailwindcss/colors';
 
-const config: Config = {
+const config: TailwindConfig = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -13,8 +14,21 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      colors: {
+        lightpurple: {
+          100: '#E6E2F3',
+          // ... you can add other shades if required
+        },
+        aqua: {
+          50: '#E6FFFF',
+          300: '#4DD0E1',
+          // ... add more shades if required
+        },
+        gray: colors.trueGray,
+      },
     },
   },
   plugins: [],
-}
-export default config
+};
+
+export default config;
