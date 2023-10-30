@@ -20,13 +20,11 @@ export function AuthProvider({ children }) {
         	}
     	);
 
-    	return () => {
-        	authListener?.unsubscribe();
-    	};
+    	
 	}, []);
 
 	const value = {
-    	signIn: (email, password) => supabase.auth.signIn({ email, password }),
+    	signInWithPassword: (email, password) => supabase.auth.signInWithPassword({ email, password }),
     	signOut: () => supabase.auth.signOut(),
     	user
 	};
