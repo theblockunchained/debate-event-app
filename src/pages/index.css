@@ -45,3 +45,16 @@ h1,h2{
 div {
     margin-top: 10px;
   }
+
+  .logout{
+    float:right;
+    text-color:Darkgray;
+background-color: transparent;
+border-bottom: 1px solid Darkgray;
+  }
+
+.inline-votes {
+    display:inline-block;
+    margin-left: 10px;
+
+}

@@ -1,13 +1,18 @@
-import { useState, useEffect, useContext } from 'react';
-import { createClient } from '@supabase/supabase-js';
+
 import { Auth } from '@supabase/auth-ui-react';
-import { AuthContext } from '../contexts/auth';
-import TopicList from './topic_list';
-import DebateRating from './DebateRating'; 
 import './index.css';
 import { Button } from '@material-tailwind/react';
+import { useEffect, useState, useContext } from 'react';
+import supabase from './supabaseClient';
+import { AuthContext } from '../contexts/auth';
+import DebateRating from './DebateRating'; 
+import UserAuth from './UserAuth';
+import EventSelector from './EventSelector';
+import EventCreation from './EventCreation';
+import DebateCreation from './DebateCreation';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+import { TopicSubmission, TopicList } from './Topics';
+
 
 export default function HomePage() {
   const { user, signOut } = useContext(AuthContext);
@@ -26,11 +31,6 @@ export default function HomePage() {
     fetchTopicsForCurrentEvent();
   }, [currentEvent]);
 
-  const handleDebateRatingSubmission = (selectedDebate, criteriaScores) => {
-    // Here, you will send the data to the database (for example, using supabase).
-    // This will involve inserting the data into the Rating table.
-  };
-
   const fetchEvents = async () => {
     const { data, error } = await supabase.from('events').select('*');
     if (data) {
@@ -41,6 +41,12 @@ export default function HomePage() {
     }
     if (error) console.error('Error fetching events:', error);
   };
+
+  const handleDebateRatingSubmission = (selectedDebate, criteriaScores) => {
+    // Here, you will send the data to the database (for example, using supabase).
+    // This will involve inserting the data into the Rating table.
+  };
+
 
   const fetchTopicsForCurrentEvent = async () => {
     if (!currentEvent) return;
@@ -103,50 +109,41 @@ export default function HomePage() {
         <Auth supabaseClient={supabase} providers={['google', 'github']} />
       ) : (
         <>
+        <div className="logout px-2 py-1 ml-2" color="black" onClick={signOut}>Logout</div>
+          <EventSelector events={events} currentEvent={currentEvent} onEventChange={setCurrentEvent} onSignOut={signOut} />
+         
+
+          <EventCreation newEventName={newEventName} onEventNameChange={setNewEventName} onCreate={handleCreateEvent} />
+
+          
+
           <div>
-            <label className="mr-2">Select Event: </label>
-            <select 
-              className="border border-aqua rounded p-1" 
-              value={currentEvent?.id || ''} 
-              onChange={(e) => {
-                const eventId = parseInt(e.target.value, 10);
-                setCurrentEvent(events.find(event => event.id === eventId));
-              }}>
-              {events.map(event => (
-                <option key={event.id} value={event.id}>
-                  {event.name}
-                </option>
-              ))}
-            </select>
-            <Button className="black rounded px-2 py-1 ml-2" color="black" onClick={signOut}>Logout</Button>
-          </div>
+  {currentEvent && (
+    <>
+      <DebateCreation 
+        currentEvent={currentEvent} 
+        topics={topics} 
+        onDebateCreation={newDebate => setDebates(prevDebates => [...prevDebates, newDebate])} 
+      />
+      <div className="mt-4">
+        <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
+        <Button className="black rounded px-2 py-1" color="black" onClick={handleTopicSubmission}>Submit Topic</Button>
 
-          <div className="mt-4">
-            <input 
-              className="border border-aqua rounded p-1 mr-2" 
-              value={newEventName} 
-              onChange={(e) => setNewEventName(e.target.value)} 
-              placeholder="New Event Name"
-            />
-            <Button className="black rounded px-2 py-1" color="black" onClick={handleCreateEvent}>Create Event</Button>
-          </div>
+        <h2 className="text-2xl font-bold mt-4">Topics for {currentEvent.name}</h2>
+        <ul className="list-inside">
+          {topics.map(topic => (
+            <li key={topic.id} className="mt-2">
+               <Button className="purple rounded px-2 py-1 ml-2" color="aqua" text="purple" onClick={() => handleVote(topic.id)}>Vote</Button>
+              <div className="inline-votes">{topic.topic_name} - Votes: {topic.votes}</div>
+             
+            </li>
+          ))}
+        </ul>
+      </div>
+    </>
+  )}
+</div>
 
-          {currentEvent && (
-            <div className="mt-4">
-              <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
-              <Button className="black rounded px-2 py-1" color="black" onClick={handleTopicSubmission}>Submit</Button>
-
-              <h2 className="text-2xl font-bold mt-4">Topics for {currentEvent.name}</h2>
-              <ul className="list-disc list-inside">
-                {topics.map(topic => (
-                  <li key={topic.id} className="mt-2">
-                    {topic.topic_name} - Votes: {topic.votes}
-                    <Button className="purple rounded px-2 py-1 ml-2" color="aqua" text="purple" onClick={() => handleVote(topic.id)}>Vote</Button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </>
       )}
       <DebateRating debates={debates} onSubmit={handleDebateRatingSubmission} />
