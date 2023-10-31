@@ -34,7 +34,7 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 card">
       <h2 className="text-2xl font-bold">Create a new debate for {currentEvent?.name}</h2>
 
       <input

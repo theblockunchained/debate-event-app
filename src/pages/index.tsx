@@ -46,7 +46,13 @@ export default function HomePage() {
     // Here, you will send the data to the database (for example, using supabase).
     // This will involve inserting the data into the Rating table.
   };
+  const [selectedEventId, setSelectedEventId] = useState(null);
 
+  const handleRatingSubmit = async (debateId, criteriaScores) => {
+      // Handle the submission of the rating here.
+      // This might involve sending the rating to your server, updating the state, etc.
+      console.log('Submitted rating for debate', debateId, 'with scores', criteriaScores);
+  };
 
   const fetchTopicsForCurrentEvent = async () => {
     if (!currentEvent) return;
@@ -104,18 +110,21 @@ export default function HomePage() {
 
   return (
     <div className="bg-purple text-aqua p-4">
-      <h1 className="text-4xl font-bold">Welcome to the Debate Judging App!</h1>
+      <h1 className="text-4xl font-bold">Welcome to the Super Debate App!</h1>
       {!user ? (
+        <div className="card">
         <Auth supabaseClient={supabase} providers={['google', 'github']} />
+        </div>
       ) : (
         <>
         <div className="logout px-2 py-1 ml-2" color="black" onClick={signOut}>Logout</div>
+        <div className="card">
           <EventSelector events={events} currentEvent={currentEvent} onEventChange={setCurrentEvent} onSignOut={signOut} />
          
 
           <EventCreation newEventName={newEventName} onEventNameChange={setNewEventName} onCreate={handleCreateEvent} />
 
-          
+          </div>
 
           <div>
   {currentEvent && (
@@ -125,17 +134,17 @@ export default function HomePage() {
         topics={topics} 
         onDebateCreation={newDebate => setDebates(prevDebates => [...prevDebates, newDebate])} 
       />
-      <div className="mt-4">
+      <div className="mt-4 card">
         <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
         <Button className="black rounded px-2 py-1" color="black" onClick={handleTopicSubmission}>Submit Topic</Button>
 
-        <h2 className="text-2xl font-bold mt-4">Topics for {currentEvent.name}</h2>
+        <h3 className="text-l font-bold mt-4">Submitted debate topics for {currentEvent.name}</h3>
+        <p>Vote on the 3 you're most interested in.</p>
         <ul className="list-inside">
           {topics.map(topic => (
             <li key={topic.id} className="mt-2">
                <Button className="purple rounded px-2 py-1 ml-2" color="aqua" text="purple" onClick={() => handleVote(topic.id)}>Vote</Button>
               <div className="inline-votes">{topic.topic_name} - Votes: {topic.votes}</div>
-             
             </li>
           ))}
         </ul>
@@ -143,11 +152,9 @@ export default function HomePage() {
     </>
   )}
 </div>
-
         </>
       )}
       <DebateRating debates={debates} onSubmit={handleDebateRatingSubmission} />
-     
     </div>
   );
 }

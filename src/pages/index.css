@@ -35,14 +35,14 @@ button{
   }
 
 h1,h2{
-    margin-bottom:30px;
+    margin-bottom:10px;
 }
 
 .black{
     background: black;
 }
 
-div {
+div, h1, h2 {
     margin-top: 10px;
   }
 
@@ -57,4 +57,13 @@ border-bottom: 1px solid Darkgray;
     display:inline-block;
     margin-left: 10px;
 
+}
+
+.card{
+    margin:20px;
+    background:white;
+    padding: 20px;
+    padding-top:30px;
+    display:inline-block;
+    border-radius:8px;
 }
