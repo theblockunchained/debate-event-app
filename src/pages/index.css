@@ -66,4 +66,5 @@ border-bottom: 1px solid Darkgray;
     padding-top:30px;
     display:inline-block;
     border-radius:8px;
+    float:left;
 }

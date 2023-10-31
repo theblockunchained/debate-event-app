@@ -1,4 +1,3 @@
-
 import { Auth } from '@supabase/auth-ui-react';
 import './index.css';
 import { Button } from '@material-tailwind/react';
@@ -6,13 +5,9 @@ import { useEffect, useState, useContext } from 'react';
 import supabase from './supabaseClient';
 import { AuthContext } from '../contexts/auth';
 import DebateRating from './DebateRating'; 
-import UserAuth from './UserAuth';
 import EventSelector from './EventSelector';
 import EventCreation from './EventCreation';
 import DebateCreation from './DebateCreation';
-
-import { TopicSubmission, TopicList } from './Topics';
-
 
 export default function HomePage() {
   const { user, signOut } = useContext(AuthContext);
@@ -25,6 +20,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchEvents();
+    fetchDebates();
   }, []);
 
   useEffect(() => {
@@ -40,6 +36,14 @@ export default function HomePage() {
       }
     }
     if (error) console.error('Error fetching events:', error);
+  };
+
+  const fetchDebates = async () => {
+    const { data, error } = await supabase.from('debates').select('*');
+    if (data) {
+      setDebates(data);
+    }
+    if (error) console.error('Error fetching debates:', error);
   };
 
   const handleDebateRatingSubmission = (selectedDebate, criteriaScores) => {
@@ -136,14 +140,14 @@ export default function HomePage() {
       />
       <div className="mt-4 card">
         <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
-        <Button className="black rounded px-2 py-1" color="black" onClick={handleTopicSubmission}>Submit Topic</Button>
+        <Button className="black rounded px-2 py-1" onClick={handleTopicSubmission}>Submit Topic</Button>
 
         <h3 className="text-l font-bold mt-4">Submitted debate topics for {currentEvent.name}</h3>
         <p>Vote on the 3 you're most interested in.</p>
         <ul className="list-inside">
           {topics.map(topic => (
             <li key={topic.id} className="mt-2">
-               <Button className="purple rounded px-2 py-1 ml-2" color="aqua" text="purple" onClick={() => handleVote(topic.id)}>Vote</Button>
+               <Button className="purple rounded px-2 py-1 ml-2" onClick={() => handleVote(topic.id)}>Vote</Button>
               <div className="inline-votes">{topic.topic_name} - Votes: {topic.votes}</div>
             </li>
           ))}
@@ -154,8 +158,10 @@ export default function HomePage() {
 </div>
         </>
       )}
-      <DebateRating debates={debates} onSubmit={handleDebateRatingSubmission} />
+      {currentEvent && (
+    <>
+      <DebateRating selectedEventId={currentEvent?.id} debates={debates} onSubmit={handleDebateRatingSubmission} />
+      </> )}
     </div>
   );
 }
-

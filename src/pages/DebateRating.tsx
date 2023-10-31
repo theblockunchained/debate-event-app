@@ -3,7 +3,7 @@ import supabase from './supabaseClient';
 
 function DebateRating({ selectedEventId, onSubmit }) {
     const [debates, setDebates] = useState([]);
-    const [selectedDebate, setSelectedDebate] = useState("");
+    const [selectedDebate, setSelectedDebate] = useState(null);
     const [criteriaScores, setCriteriaScores] = useState({
         criterion1: 7,
         criterion2: 7,
@@ -12,19 +12,15 @@ function DebateRating({ selectedEventId, onSubmit }) {
     });
 
     useEffect(() => {
-        async function fetchDebates() {
-            const { data: fetchedDebates, error } = await supabase
-                .from('debates')
-                .select('*')
-                .eq('event_id', selectedEventId);
-
+        const fetchDebates = async () => {
+            const { data, error } = await supabase.from('debates').select('*').eq('event_id', selectedEventId);
+            if (data) {
+                setDebates(data);
+            }
             if (error) {
                 console.error('Error fetching debates:', error);
-                return;
             }
-
-            setDebates(fetchedDebates || []);
-        }
+        };
 
         if (selectedEventId) {
             fetchDebates();
@@ -51,11 +47,17 @@ function DebateRating({ selectedEventId, onSubmit }) {
     return (
         <div className="card">
             <label>Select Debate: </label>
-            <select className="border border-aqua rounded p-1 mr-2" value={selectedDebate} onChange={e => setSelectedDebate(e.target.value)}>
-                <option value="" disabled>Select a debate</option>
+            <select className="border rounded p-1 mr-2" 
+                value={selectedDebate ? selectedDebate.id : ''} 
+                onChange={e => {
+                    const selectedId = e.target.value;
+                    setSelectedDebate(debates.find(debate => debate.id.toString() === selectedId));
+                }}
+            >
+                <option value="">Select a debate</option>
                 {debates.map(debate => (
                     <option key={debate.id} value={debate.id}>
-                        {debate.name} {/* Adjust this if 'name' isn't the correct attribute */}
+                        {debate.affirmative_name} vs {debate.negative_name}
                     </option>
                 ))}
             </select>
