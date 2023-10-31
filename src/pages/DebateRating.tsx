@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import supabase from './supabaseClient';
 
-function DebateRating({ selectedEventId, onSubmit }) {
+function DebateRating({ selectedEventId, user }) {
     const [debates, setDebates] = useState([]);
     const [selectedDebate, setSelectedDebate] = useState(null);
-    const [criteriaScores, setCriteriaScores] = useState({
-        criterion1: 7,
-        criterion2: 7,
-        criterion3: 7,
-        criterion4: 7
-    });
+    const [criteria, setCriteria] = useState([]);
+    const [criteriaScores, setCriteriaScores] = useState({});
 
     useEffect(() => {
         const fetchDebates = async () => {
@@ -22,23 +18,62 @@ function DebateRating({ selectedEventId, onSubmit }) {
             }
         };
 
+        const fetchCriteria = async () => {
+            const { data, error } = await supabase.from('criteria').select('*');
+            if (data) {
+                setCriteria(data);
+                // Initialize criteriaScores with each criterion set to 7 for both debaters
+                const initialScores = data.reduce((scores, criterion) => {
+                    scores[criterion.id] = { affirmative: 7, negative: 7 };
+                    return scores;
+                }, {});
+                setCriteriaScores(initialScores);
+            }
+            if (error) {
+                console.error('Error fetching criteria:', error);
+            }
+        };
+
         if (selectedEventId) {
             fetchDebates();
+            fetchCriteria();
         } else {
             setDebates([]);
+            setCriteria([]);
         }
     }, [selectedEventId]);
 
-    const handleCriterionChange = (e, criterion) => {
+    const handleCriterionChange = (e, criterionId, debater) => {
         setCriteriaScores({
             ...criteriaScores,
-            [criterion]: parseInt(e.target.value, 10)
+            [criterionId]: {
+                ...criteriaScores[criterionId],
+                [debater]: parseInt(e.target.value, 10)
+            }
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (selectedDebate) {
-            onSubmit(selectedDebate, criteriaScores);
+            for (const [criterionId, scores] of Object.entries(criteriaScores)) {
+                for (const [debater, score] of Object.entries(scores)) {
+                    const { error } = await supabase
+                        .from('ratings')
+                        .insert([
+                            { 
+                                debate_id: selectedDebate.id, 
+                                user_id: user.id, 
+                                criterion_id: criterionId, 
+                                score: score,
+                                debater: debater
+                            },
+                        ]);
+                    if (error) {
+                        console.error('Error submitting rating:', error);
+                    }
+                }
+            }
+            console.log('Rating submitted successfully');
         } else {
             alert("Please select a debate first.");
         }
@@ -64,21 +99,28 @@ function DebateRating({ selectedEventId, onSubmit }) {
 
             <div>
                 Rate the debate on the following criteria (7-10):
-                {['criterion1', 'criterion2', 'criterion3', 'criterion4'].map(criterion => (
-                    <div key={criterion}>
-                        <label>{criterion}: </label>
+                {criteria.map(criterion => (
+                    <div key={criterion.id}>
+                        <label>{criterion.name}: </label>
                         <input 
                             type="number" 
                             min="7" 
                             max="10" 
-                            value={criteriaScores[criterion]} 
-                            onChange={e => handleCriterionChange(e, criterion)}
+                            value={criteriaScores[criterion.id].affirmative} 
+                            onChange={e => handleCriterionChange(e, criterion.id, 'affirmative')}
+                        />
+                        <input 
+                            type="number" 
+                            min="7" 
+                            max="10" 
+                            value={criteriaScores[criterion.id].negative} 
+                            onChange={e => handleCriterionChange(e, criterion.id, 'negative')}
                         />
                     </div>
                 ))}
             </div>
 
-            <button onClick={handleSubmit}>Submit Rating</button>
+            <button className='black rounded px-2 py-1 ml-2' onClick={handleSubmit}>Submit Rating</button>
         </div>
     );
 }

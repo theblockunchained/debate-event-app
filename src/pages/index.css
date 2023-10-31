@@ -24,6 +24,8 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+    max-width: 1080px;
+  margin: auto;
 }
 
 button{
@@ -68,3 +70,4 @@ border-bottom: 1px solid Darkgray;
     border-radius:8px;
     float:left;
 }
+

@@ -46,18 +46,6 @@ export default function HomePage() {
     if (error) console.error('Error fetching debates:', error);
   };
 
-  const handleDebateRatingSubmission = (selectedDebate, criteriaScores) => {
-    // Here, you will send the data to the database (for example, using supabase).
-    // This will involve inserting the data into the Rating table.
-  };
-  const [selectedEventId, setSelectedEventId] = useState(null);
-
-  const handleRatingSubmit = async (debateId, criteriaScores) => {
-      // Handle the submission of the rating here.
-      // This might involve sending the rating to your server, updating the state, etc.
-      console.log('Submitted rating for debate', debateId, 'with scores', criteriaScores);
-  };
-
   const fetchTopicsForCurrentEvent = async () => {
     if (!currentEvent) return;
 
@@ -124,44 +112,36 @@ export default function HomePage() {
         <div className="logout px-2 py-1 ml-2" color="black" onClick={signOut}>Logout</div>
         <div className="card">
           <EventSelector events={events} currentEvent={currentEvent} onEventChange={setCurrentEvent} onSignOut={signOut} />
-         
-
           <EventCreation newEventName={newEventName} onEventNameChange={setNewEventName} onCreate={handleCreateEvent} />
+        </div>
 
-          </div>
+        {currentEvent && (
+          <>
+            <DebateCreation 
+              currentEvent={currentEvent} 
+              topics={topics} 
+              onDebateCreation={newDebate => setDebates(prevDebates => [...prevDebates, newDebate])} 
+            />
+            <div className="mt-4 card">
+              <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
+              <Button className="black rounded px-2 py-1" onClick={handleTopicSubmission}>Submit Topic</Button>
 
-          <div>
-  {currentEvent && (
-    <>
-      <DebateCreation 
-        currentEvent={currentEvent} 
-        topics={topics} 
-        onDebateCreation={newDebate => setDebates(prevDebates => [...prevDebates, newDebate])} 
-      />
-      <div className="mt-4 card">
-        <input className="border border-aqua rounded p-1 mr-2" value={newTopic} onChange={e => setNewTopic(e.target.value)} placeholder="Enter a new topic" />
-        <Button className="black rounded px-2 py-1" onClick={handleTopicSubmission}>Submit Topic</Button>
-
-        <h3 className="text-l font-bold mt-4">Submitted debate topics for {currentEvent.name}</h3>
-        <p>Vote on the 3 you're most interested in.</p>
-        <ul className="list-inside">
-          {topics.map(topic => (
-            <li key={topic.id} className="mt-2">
-               <Button className="purple rounded px-2 py-1 ml-2" onClick={() => handleVote(topic.id)}>Vote</Button>
-              <div className="inline-votes">{topic.topic_name} - Votes: {topic.votes}</div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
-  )}
-</div>
+              <h3 className="text-l font-bold mt-4">Submitted debate topics for {currentEvent.name}</h3>
+              <p>Vote on the 3 you're most interested in.</p>
+              <ul className="list-inside">
+                {topics.map(topic => (
+                  <li key={topic.id} className="mt-2">
+                    <Button className="purple rounded px-2 py-1 ml-2" onClick={() => handleVote(topic.id)}>Vote</Button>
+                    <div className="inline-votes">{topic.topic_name} - Votes: {topic.votes}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <DebateRating selectedEventId={currentEvent?.id} user={user} />
+          </>
+        )}
         </>
       )}
-      {currentEvent && (
-    <>
-      <DebateRating selectedEventId={currentEvent?.id} debates={debates} onSubmit={handleDebateRatingSubmission} />
-      </> )}
     </div>
   );
 }
