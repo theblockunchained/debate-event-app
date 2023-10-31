@@ -1,5 +1,6 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Button } from '@material-tailwind/react';
+import Toast from './Toast';
 
 interface EventCreationProps {
     newEventName: string;
@@ -8,8 +9,30 @@ interface EventCreationProps {
 }
 
 const EventCreation: React.FC<EventCreationProps> = ({ newEventName, onEventNameChange, onCreate }) => {
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('success');
+
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         onEventNameChange(e.target.value);
+    };
+
+    const handleCreate = () => {
+        if (!newEventName.trim()) {
+            console.log("Event name is required");
+            setToastMessage('Event name is required.');
+            setToastType('error');
+            setShowToast(true);
+            return;
+        }
+        onCreate();
+        setToastMessage('Event created successfully!');
+        setToastType('success');
+        setShowToast(true);
+    };
+
+    const handleCloseToast = () => {
+        setShowToast(false);
     };
 
     return (
@@ -20,7 +43,15 @@ const EventCreation: React.FC<EventCreationProps> = ({ newEventName, onEventName
           onChange={handleInputChange}
           placeholder="New event name"
         />
-        <Button className="black rounded px-2 py-1" color="black" onClick={onCreate}>Create Event</Button>
+        <Button className="black rounded px-2 py-1" color="black" onClick={handleCreate}>Create Event</Button>
+
+        {showToast && (
+          <Toast 
+            message={toastMessage} 
+            type={toastType} 
+            onClose={handleCloseToast}
+          />
+        )}
       </div>
     );
 }

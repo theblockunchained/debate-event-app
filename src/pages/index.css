@@ -71,3 +71,29 @@ border-bottom: 1px solid Darkgray;
     float:left;
 }
 
+.rating-input{
+max-width: 30px;
+float:right;
+margin:5px;
+margin-left:20px;
+}
+
+.float-right{
+    float:right;
+    margin-right:20px;
+}
+
+.spacer-30{
+    height: 30px;
+}
+.margin-bt-15{
+    margin-bottom: 15px;
+}
+
+Button{
+    text-transform:uppercase!important;
+    font-weight:300!important;
+    font-size: smaller!important;
+    letter-spacing: 0.5px!important;
+
+}
