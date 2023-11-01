@@ -8,7 +8,7 @@ import DebateRating from './DebateRating';
 import EventSelector from './EventSelector';
 import EventCreation from './EventCreation';
 import DebateCreation from './DebateCreation';
-import TopicCreation from './TopicCreation';  // Add this import
+import TopicCreation from './TopicCreation';  
 
 export default function HomePage() {
   const { user, signOut } = useContext(AuthContext);
