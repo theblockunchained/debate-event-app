@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import supabase from './supabaseClient';
 import Toast from './Toast';
 
-function DebateRating({ selectedEventId, user }) {
+interface DebateRatingProps {
+    selectedEventId: string | number;
+    user: any;
+}
+
+function DebateRating({ selectedEventId, user }: DebateRatingProps) {
     const [debates, setDebates] = useState([]);
     const [selectedDebate, setSelectedDebate] = useState(null);
     const [criteria, setCriteria] = useState([]);
@@ -48,7 +53,7 @@ function DebateRating({ selectedEventId, user }) {
         }
     }, [selectedEventId]);
 
-    const handleCriterionChange = (e, criterionId, debater) => {
+    const handleCriterionChange = (e: React.ChangeEvent<HTMLInputElement>, criterionId: string | number, debater: string) => {
         setCriteriaScores({
             ...criteriaScores,
             [criterionId]: {
@@ -63,21 +68,49 @@ function DebateRating({ selectedEventId, user }) {
             let errorFlag = false;
             for (const [criterionId, scores] of Object.entries(criteriaScores)) {
                 for (const [debater, score] of Object.entries(scores)) {
-                    const { error } = await supabase
-                        .from('ratings')
-                        .insert([
-                            { 
-                                debate_id: selectedDebate.id, 
-                                user_id: user.id, 
-                                criterion_id: criterionId, 
-                                score: score,
-                                debater: debater
-                            },
-                        ]);
-                    if (error) {
-                        console.error('Error submitting rating:', error);
-                        errorFlag = true;
+                    interface Debate {
+                        id: number;
+                        // add any other properties of the debate object here
                     }
+
+                    const handleSubmit = async () => {
+                        if (selectedDebate) {
+                            let errorFlag = false;
+                            for (const [criterionId, scores] of Object.entries(criteriaScores)) {
+                                for (const [debater, score] of Object.entries(scores)) {
+                                    const { error } = await supabase
+                                        .from('ratings')
+                                        .insert([
+                                            { 
+                                                debate_id: selectedDebate.id, 
+                                                user_id: user.id, 
+                                                criterion_id: criterionId, 
+                                                score: score,
+                                                debater: debater
+                                            },
+                                        ]);
+                                    if (error) {
+                                        console.error('Error submitting rating:', error);
+                                        errorFlag = true;
+                                    }
+                                }
+                            }
+                            if (errorFlag) {
+                                setToastMessage('There was an error submitting your rating. Please try again.');
+                                setToastType('error');
+                                setShowToast(true);
+                            } else {
+                                setToastMessage('Rating submitted successfully!');
+                                setToastType('success');
+                                setShowToast(true);
+                            }
+                        } else {
+                            setToastMessage('Please select a debate first.');
+                            setToastType('error');
+                            setShowToast(true);
+                        }
+                    };
+
                 }
             }
             if (errorFlag) {

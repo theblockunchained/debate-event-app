@@ -30,13 +30,14 @@ export default function HomePage() {
   const fetchEvents = async () => {
     const { data, error } = await supabase.from('events').select('*');
     if (data) {
-      setEvents(data);
+      setEvents(data as { name: string }[]);
       if (!currentEvent) {
         setCurrentEvent(data[0]);
       }
     }
     if (error) console.error('Error fetching events:', error);
   };
+
 
   const fetchDebates = async () => {
     const { data, error } = await supabase.from('debates').select('*');
