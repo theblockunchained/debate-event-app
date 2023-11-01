@@ -9,7 +9,7 @@ function EventSelector({ events, currentEvent, onEventChange }) {
 
     return (
         <div>
-            <label className="mr-2">Select Event: </label>
+            <h3 className="mr-2 text-2xl font-bold m">Select your debate event </h3>
             <select 
               className="border border-aqua rounded p-1" 
               value={currentEvent?.id || ''} 

@@ -82,15 +82,17 @@ export default function HomePage() {
   };
 
   return (
-    <div className="bg-purple text-aqua p-4">
-      <h1 className="text-4xl font-bold">Welcome to the Super Debate App!</h1>
+    <div className="main-container text-aqua p-4">
+    
+      <h1 className="text-4xl font-bold text-center">Welcome to the Super Debate App!</h1>
+      <div className='margin-bt-30 text-center'>Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.</div>
       {!user ? (
         <div className="card">
           <Auth supabaseClient={supabase} providers={['google', 'github']} />
         </div>
       ) : (
         <>
-          <div className="logout px-2 py-1 ml-2" color="black" onClick={signOut}>Logout</div>
+      
           <div className="card">
             <EventSelector events={events} currentEvent={currentEvent} onEventChange={setCurrentEvent} onSignOut={signOut} />
             <EventCreation newEventName={newEventName} onEventNameChange={setNewEventName} onCreate={handleCreateEvent} />
@@ -103,6 +105,7 @@ export default function HomePage() {
                 onDebateCreation={newDebate => setDebates(prevDebates => [...prevDebates, newDebate])} 
               />
               <div className="mt-4 card">
+              <h3 className='mr-2 text-2xl font-bold m'>Submit a topic or vote for one</h3>
               <TopicCreation 
                 currentEvent={currentEvent}
                 topics={topics}
@@ -110,8 +113,8 @@ export default function HomePage() {
                 onVote={handleVote}
               />
               
-                 <h3 className="text-l font-bold mt-4">Submitted debate topics for {currentEvent.name}</h3>
-              <p>Vote on the 3 you're most interested in.</p>
+                 <h3 className="text-l font-bold mt-4">Vote on submitted debate topics for {currentEvent.name}</h3>
+              
               <ul className="list-inside">
                 {topics.map(topic => (
                   <li key={topic.id} className="mt-2">
@@ -126,6 +129,11 @@ export default function HomePage() {
           )}
         </>
       )}
+       <div>
+      <div className="logout px-2 py-1 ml-2 text-center" color="black" onClick={signOut}>Logout</div>
+      </div>
     </div>
+    
   );
+  
 }

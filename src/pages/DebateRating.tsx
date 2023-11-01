@@ -98,6 +98,7 @@ function DebateRating({ selectedEventId, user }) {
 
     return (
         <div className="card">
+            <h3 className='mr-2 text-2xl font-bold m'>Judge the debate round</h3>
             <label>Select a debate to judge: </label>
             <select className="border rounded p-1 mr-2" 
                 value={selectedDebate ? selectedDebate.id : ''} 
