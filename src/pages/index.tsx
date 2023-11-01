@@ -2,7 +2,7 @@ import { Auth } from '@supabase/auth-ui-react';
 import { Button } from '@material-tailwind/react';
 import './index.css';
 import { useEffect, useState, useContext } from 'react';
-import supabase from './supabaseClient';
+import supabase from './SupabaseClient';
 import { AuthContext } from '../contexts/auth';
 import DebateRating from './DebateRating'; 
 import EventSelector from './EventSelector';
@@ -89,7 +89,7 @@ export default function HomePage() {
       <div className='margin-bt-30 text-center'>Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.</div>
       {!user ? (
         <div className="card">
-          <Auth supabaseClient={supabase} providers={['google', 'github']} />
+          <Auth SupabaseClient={supabase} providers={['google', 'github']} />
         </div>
       ) : (
         <>
