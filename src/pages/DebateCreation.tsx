@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@material-tailwind/react';
-import supabase from './supabaseClient';
+import supabase from './SupabaseClient';
 import Toast from './Toast';
 
 export default function DebateCreation({ currentEvent, topics, onDebateCreation }) {
