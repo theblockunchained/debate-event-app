@@ -84,11 +84,11 @@ export default function HomePage() {
   return (
     <div className="main-container text-aqua p-4">
     
-      <h1 className="text-4xl font-bold text-center">Welcome to the Super Debate App!</h1>
-      <div className='margin-bt-30 text-center'>Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.</div>
+      <h1 className="text-4xl font-bold text-center white-text">Welcome to the Super Debate App!</h1>
+      <div className='margin-bt-30 text-center white-text'>Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.</div>
       {!user ? (
         <div className="card">
-          <Auth supabaseClient={supabase} providers={['google', 'github']} />
+          <Auth supabaseClient={supabase} providers={[]} />
         </div>
       ) : (
         <>

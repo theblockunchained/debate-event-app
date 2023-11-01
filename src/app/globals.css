@@ -29,3 +29,6 @@ body {
 div{
   text-color:blue;
 }
+input#email, input#password, .supabase-auth-ui_ui-button {
+  padding: 5px;
+}
