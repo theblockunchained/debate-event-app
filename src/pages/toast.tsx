@@ -15,6 +15,6 @@ function Toast({ message, type, onClose }) {
             <button onClick={onClose} className="ml-auto">X</button>
         </div>
     );
-}
+} 
 
 export default Toast;
