@@ -1,16 +1,42 @@
 import React, { useState } from 'react';
 import { Button } from '@material-tailwind/react';
-import supabase from './SupabaseClient';
+import supabase from '../SupabaseClient';
 import Toast from './Toast';
 
-export default function DebateCreation({ currentEvent, topics, onDebateCreation }) {
+interface Topic {
+  id: number;
+  topic_name: string;
+}
+
+interface Event {
+  id: number;
+  name: string;
+}
+
+interface Debate {
+  id: number;
+  affirmative_name: string;
+  negative_name: string;
+  topic_id: number;
+  event_id: number;
+  name: string;
+  topic: string;
+}
+
+interface DebateCreationProps {
+  currentEvent: Event;
+  topics: Topic[];
+  onDebateCreation: (debate: Debate) => void;
+}
+
+export default function DebateCreation({ currentEvent, topics, onDebateCreation }: DebateCreationProps) {
   const [affirmativeName, setAffirmativeName] = useState('');
   const [negativeName, setNegativeName] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState('success');
-  
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
+  const [debates, setDebates] = useState<Debate[]>([]);
 
   const handleDebateSubmission = async () => {
     if (!affirmativeName || !negativeName || !selectedTopic || !currentEvent) {
@@ -38,7 +64,6 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
       return;
     }
 
-    // Fetch the recently created debate
     const { data: fetchedData, error: fetchError } = await supabase
       .from('debates')
       .select('*')
@@ -94,24 +119,24 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
         onChange={e => setNegativeName(e.target.value)}
         placeholder="Negative Name"
       />
-<div></div>
-      <select
-        className="border border-aqua rounded p-1 mr-2"
-        value={selectedTopic ? selectedTopic.id : ''}
-        onChange={e => {
-          const selectedId = e.target.value;
-          setSelectedTopic(topics.find(topic => topic.id.toString() === selectedId));
-        }}
-      >
-        <option value="">Select a topic</option>
-        {topics.map(topic => (
-          <option key={topic.id} value={topic.id}>
-            {topic.topic_name}
-          </option>
-        ))}
-      </select>
 
-      <Button className="black rounded px-2 py-1" color="black" onClick={handleDebateSubmission}>Submit Debate</Button>
+<select
+  className="border border-aqua rounded p-1 mr-2"
+  value={selectedTopic ? selectedTopic.id : ''}
+  onChange={e => {
+    const selectedId = e.target.value;
+    setSelectedTopic(topics.find(topic => topic.id.toString() === selectedId) ?? null);
+  }}
+>
+  <option value="">Select a topic</option>
+  {(topics || []).map(topic => (
+    <option key={topic.id} value={topic.id}>
+      {topic.topic_name}
+    </option>
+  ))}
+</select>
+
+      <Button className="black rounded px-2 py-1" onClick={handleDebateSubmission}>Submit Debate</Button>
 
       {showToast && (
         <Toast 

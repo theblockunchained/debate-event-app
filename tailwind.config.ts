@@ -1,7 +1,23 @@
-import { TailwindConfig } from 'tailwindcss/types/config';
 import colors from 'tailwindcss/colors';
 
-const config: TailwindConfig = {
+interface MyTailwindConfig {
+  content: string[];
+  theme: {
+    extend: {
+      backgroundImage: {
+        [key: string]: string;
+      };
+      colors: {
+        [key: string]: {
+          [key: number]: string;
+        };
+      };
+    };
+  };
+  plugins: any[];
+}
+
+const config: MyTailwindConfig = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',

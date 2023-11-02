@@ -11,7 +11,7 @@ interface EventCreationProps {
 const EventCreation: React.FC<EventCreationProps> = ({ newEventName, onEventNameChange, onCreate }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
-    const [toastType, setToastType] = useState('success');
+    const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         onEventNameChange(e.target.value);
@@ -43,7 +43,7 @@ const EventCreation: React.FC<EventCreationProps> = ({ newEventName, onEventName
           onChange={handleInputChange}
           placeholder="New event name"
         />
-        <Button className="black rounded px-2 py-1" color="black" onClick={handleCreate}>Create Event</Button>
+        <Button className="black rounded px-2 py-1" onClick={handleCreate}>Create Event</Button>
 
         {showToast && (
           <Toast 

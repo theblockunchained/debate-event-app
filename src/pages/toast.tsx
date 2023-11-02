@@ -1,6 +1,12 @@
 import React from 'react';
 
-function Toast({ message, type, onClose }) {
+interface ToastProps {
+    message: string;
+    type: 'success' | 'error';
+    onClose: () => void;
+}
+
+function Toast({ message, type, onClose }: ToastProps) {
     const bgColor = type === 'success' ? 'green' : 'red';
     const icon = type === 'success' 
         ? <svg fill="currentColor" viewBox="0 0 20 20" className="w-5 h-5"><path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/></svg>

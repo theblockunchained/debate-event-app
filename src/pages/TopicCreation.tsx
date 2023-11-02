@@ -1,18 +1,33 @@
 import React, { useState } from 'react';
 import { Button } from '@material-tailwind/react';
-import supabase from './SupabaseClient';
+import supabase from '../SupabaseClient';
 import Toast from './Toast';
 
-interface TopicCreationProps {
-  currentEvent: any;
-  onTopicCreation: (newTopic: any) => void;
+interface Event {
+  id: number;
+  name: string;
+  // ... other properties
 }
 
-const TopicCreation: React.FC<TopicCreationProps> = ({ currentEvent, onTopicCreation }) => {
+interface Topic {
+  id: number;
+  topic_name: string;
+  votes: number;
+  // ...other properties of a Topic
+}
+
+interface TopicCreationProps {
+  currentEvent: Event | null;  
+  topics: Topic[];
+  onTopicCreation: (newTopic: any) => void;  // Consider specifying a type instead of any
+  onVote: (topicId: number) => Promise<void>;
+}
+
+const TopicCreation: React.FC<TopicCreationProps> = ({ currentEvent, topics, onTopicCreation, onVote }) => {
   const [newTopic, setNewTopic] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState('success');
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
 
   const handleTopicSubmission = async () => {
     if (!newTopic.trim() || !currentEvent) {
