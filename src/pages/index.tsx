@@ -4,11 +4,11 @@ import './index.css';
 import { useEffect, useState, useContext, useCallback } from 'react';
 import supabase from '../SupabaseClient';
 import { AuthContext } from '../contexts/auth';
-import DebateRating from './DebateRating'; 
+import DebateRating from './DebateRating';
 import EventSelector from './EventSelector';
 import EventCreation from './EventCreation';
 import DebateCreation from './DebateCreation';
-import TopicCreation from './TopicCreation';  
+import TopicCreation from './TopicCreation';
 import React from 'react';
 
 interface Event {
@@ -46,7 +46,7 @@ export default function HomePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const [newEventName, setNewEventName] = useState('');
-  const [debates, setDebates] = useState<AppDebate[]>([]);  // Updated to AppDebate[]
+  const [debates, setDebates] = useState<AppDebate[]>([]);
 
   useEffect(() => {
     fetchEvents();
@@ -89,7 +89,7 @@ export default function HomePage() {
       setTopics(data as Topic[]);
     }
     if (error) console.error('Error fetching topics:', error);
-  }, [currentEvent, setTopics]); 
+  }, [currentEvent, setTopics]);
 
   const handleVote = async (topicId: number) => {
     const topicToUpdate = topics.find(t => t.id === topicId);
@@ -117,32 +117,40 @@ export default function HomePage() {
       setEvents(prevEvents => [...prevEvents, data[0]]);
       setNewEventName('');
     }
-  };  
+  };
 
   return (
     <div className="main-container text-aqua p-4">
-      <h1 className="text-4xl font-bold text-center">Welcome to the Super Debate App!</h1>
-      <div className='margin-bt-30 text-center'>Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.</div>
+      <div className='items-center flex justify-center margin-bt-30'>
+      <img src="super-debate-logo.png" alt="logo" width="200px"/>
+      </div>
+      <h1 className="text-4xl font-bold text-center white-text">Welcome to the Super Debate App!</h1>
+      <div className='margin-bt-30 text-center white-text'>Easily utilize the Super Debate format. Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.</div>
       {!user ? (
+        <><div className='text-center white-text'>Please sign in to continue.</div>
         <div className="card">
-          <Auth supabaseClient={supabase} providers={['google', 'github']} />
-        </div>
+          <div className='auth-form-container'>
+          <Auth supabaseClient={supabase} providers={['google']} />
+          </div>
+        </div></>
       ) : (
         <>
           <div className="card">
             <EventSelector events={events} currentEvent={currentEvent} onEventChange={setCurrentEvent} />
+            -------------------
+            <div className="font-bold margin-top-10">Or create a new event</div>
             <EventCreation newEventName={newEventName} onEventNameChange={setNewEventName} onCreate={handleCreateEvent} />
           </div>
           {currentEvent && (
             <>
-              <DebateCreation 
-                currentEvent={currentEvent} 
-                topics={topics || []}  // Ensure topics is always an array
+              <DebateCreation
+                currentEvent={currentEvent}
+                topics={topics}
                 onDebateCreation={newDebate => setDebates(prevDebates => [...prevDebates, newDebate as AppDebate])}
               />
               <div className="mt-4 card">
                 <h3 className='mr-2 text-2xl font-bold m'>Submit a topic or vote for one</h3>
-                <TopicCreation 
+                <TopicCreation
                   currentEvent={currentEvent}
                   topics={topics}
                   onTopicCreation={newTopic => setTopics(prevTopics => [...prevTopics, newTopic])}
@@ -161,11 +169,11 @@ export default function HomePage() {
               <DebateRating selectedEventId={currentEvent?.id} user={user} />
             </>
           )}
+          <div>
+            <div className="logout px-2 py-1 ml-2 text-center white-text" onClick={signOut}>Logout</div>
+          </div>
         </>
       )}
-      <div>
-        <div className="logout px-2 py-1 ml-2 text-center" onClick={signOut}>Logout</div>
-      </div>
     </div>
   );
 }

@@ -14,9 +14,11 @@ interface EventSelectorProps {
 function EventSelector({ events, currentEvent, onEventChange }: EventSelectorProps) {
   const handleEventChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const eventId = parseInt(e.target.value, 10);
+    if (isNaN(eventId)) {
+      onEventChange(null);
+      return;
+    }
     const selectedEvent = events.find(event => event.id === eventId) ?? null;
-
-    // Call the callback function to notify the parent component about the change
     onEventChange(selectedEvent);
   }
 
@@ -25,10 +27,11 @@ function EventSelector({ events, currentEvent, onEventChange }: EventSelectorPro
       <h3 className="mr-2 text-2xl font-bold m">Select your debate event </h3>
       <select 
         className="border border-aqua rounded p-1" 
-        value={currentEvent?.id || ''} 
+        value={currentEvent?.id || ''}  // Should fall back to '' if currentEvent is null or undefined
         onChange={handleEventChange}
       >
-        {events && events.map(event => (  // Check for events before mapping
+        <option value="">Select an option</option>  // Default option
+        {events && events.map(event => (
           <option key={event.id} value={event.id}>
             {event.name}
           </option>

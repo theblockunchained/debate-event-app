@@ -119,7 +119,7 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
         onChange={e => setNegativeName(e.target.value)}
         placeholder="Negative Name"
       />
-
+<div>
 <select
   className="border border-aqua rounded p-1 mr-2"
   value={selectedTopic ? selectedTopic.id : ''}
@@ -137,7 +137,7 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
 </select>
 
       <Button className="black rounded px-2 py-1" onClick={handleDebateSubmission}>Submit Debate</Button>
-
+      </div>
       {showToast && (
         <Toast 
           message={toastMessage} 

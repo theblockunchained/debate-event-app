@@ -6,7 +6,7 @@ interface UserAuthProps {
 }
 
 const UserAuth: React.FC<UserAuthProps> = ({ supabase }) => {
-  return <Auth supabaseClient={supabase} providers={['google', 'github']} />;
+  return <Auth supabaseClient={supabase} providers={['google']} />;
 }
 
 export default UserAuth;

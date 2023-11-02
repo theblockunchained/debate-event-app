@@ -4,8 +4,8 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 1, 239, 251;
-  --background-end-rgb: 255, 255, 255;
+  --background-start-rgb: 74, 0, 192;
+  --background-end-rgb: 1, 239, 251;
 }
 
 @media (prefers-color-scheme: light) {
@@ -18,16 +18,18 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+   background-image: linear-gradient(252.98deg, rgb(5, 213, 255) 4.93%, rgb(95, 64, 248) 50.69%);
     max-width: 1080px;
   margin: auto;
+  min-height: 100vh;
+  padding-bottom: 80px;
 }
 
+.auth-form-container{
+    max-width: 400px;
+  margin: auto;
+  padding-top:10px;
+}
 button{
   color:white;
 }
@@ -69,6 +71,11 @@ margin-bottom: 50px;
     max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  filter: drop-shadow(0px 14px 24px rgba(0,0,0,0.25));
+}
+
+#email, #password, button.supabase-auth-ui_ui-button {
+  padding: 5px;
 }
 
 .rating-input{
@@ -110,4 +117,20 @@ h3{
 
 .margin-bt-30{
     margin-bottom:30px;
+}
+
+.white-text{
+    color:white;
+}
+
+.supabase-auth-ui_ui-button.c-bOcPnF.c-bOcPnF-cmFMMs-color-primary {
+  color: white;
+  background: black;
+  border-color: black;
+}
+
+.supabase-auth-ui_ui-button.c-bOcPnF.c-bOcPnF-cmFMMs-color-primary:hover {
+  color: black;
+  background: white;
+  border-color: black;
 }
