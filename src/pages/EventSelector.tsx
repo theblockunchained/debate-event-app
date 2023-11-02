@@ -30,7 +30,7 @@ function EventSelector({ events, currentEvent, onEventChange }: EventSelectorPro
         value={currentEvent?.id || ''}  // Should fall back to '' if currentEvent is null or undefined
         onChange={handleEventChange}
       >
-        <option value="">Select an option</option>  // Default option
+        <option value="">Select an option</option> 
         {events && events.map(event => (
           <option key={event.id} value={event.id}>
             {event.name}

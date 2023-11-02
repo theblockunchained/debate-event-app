@@ -14,14 +14,12 @@ import React from 'react';
 interface Event {
   id: number;
   name: string;
-  // ... other properties
 }
 
 interface Topic {
   id: number;
   topic_name: string;
   votes: number;
-  // ...other properties of a Topic
 }
 
 interface AppDebate {
@@ -137,7 +135,7 @@ export default function HomePage() {
         <>
           <div className="card">
             <EventSelector events={events} currentEvent={currentEvent} onEventChange={setCurrentEvent} />
-            -------------------
+            <div>-------------------</div>
             <div className="font-bold margin-top-10">Or create a new event</div>
             <EventCreation newEventName={newEventName} onEventNameChange={setNewEventName} onCreate={handleCreateEvent} />
           </div>
