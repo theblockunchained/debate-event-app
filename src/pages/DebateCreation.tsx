@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@material-tailwind/react';
 import supabase from '../SupabaseClient';
 import Toast from './Toast';
@@ -23,6 +23,11 @@ interface Debate {
   topic: string;
 }
 
+interface Profile {
+  id: string;
+  name: string;
+}
+
 interface DebateCreationProps {
   currentEvent: Event;
   topics: Topic[];
@@ -30,16 +35,30 @@ interface DebateCreationProps {
 }
 
 export default function DebateCreation({ currentEvent, topics, onDebateCreation }: DebateCreationProps) {
-  const [affirmativeName, setAffirmativeName] = useState('');
-  const [negativeName, setNegativeName] = useState('');
+  const [selectedAffirmative, setSelectedAffirmative] = useState<string>('');
+  const [selectedNegative, setSelectedNegative] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
-  const [debates, setDebates] = useState<Debate[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      const { data, error } = await supabase.from('profiles').select('*');
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        return;
+      }
+      console.log("Fetched profiles:", data);
+      setProfiles(data || []);
+    };
+
+    fetchProfiles();
+  }, []);
 
   const handleDebateSubmission = async () => {
-    if (!affirmativeName || !negativeName || !selectedTopic || !currentEvent) {
+    if (!selectedAffirmative || !selectedNegative || !selectedTopic || !currentEvent) {
       console.log("Missing required fields");
       setToastMessage('Please fill in all fields.');
       setToastType('error');
@@ -49,8 +68,8 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
 
     const { error } = await supabase.from('debates').insert([
       { 
-        affirmative_name: affirmativeName, 
-        negative_name: negativeName, 
+        affirmative_name: selectedAffirmative, 
+        negative_name: selectedNegative, 
         topic_id: selectedTopic.id,
         event_id: currentEvent.id 
       }
@@ -67,8 +86,8 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
     const { data: fetchedData, error: fetchError } = await supabase
       .from('debates')
       .select('*')
-      .eq('affirmative_name', affirmativeName)
-      .eq('negative_name', negativeName)
+      .eq('affirmative_name', selectedAffirmative)
+      .eq('negative_name', selectedNegative)
       .eq('topic_id', selectedTopic.id)
       .eq('event_id', currentEvent.id)
       .limit(1);
@@ -91,8 +110,8 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
     setShowToast(true);
 
     setTimeout(() => {
-      setAffirmativeName('');
-      setNegativeName('');
+      setSelectedAffirmative('');
+      setSelectedNegative('');
       setSelectedTopic(null);
       setShowToast(false);
     }, 3000);
@@ -104,40 +123,54 @@ export default function DebateCreation({ currentEvent, topics, onDebateCreation 
 
   return (
     <div className="mt-4 card">
-      <h2 className="text-2xl font-bold">Create a new debate for {currentEvent?.name}</h2>
-
-      <input
-        className="border border-aqua rounded p-1 mr-2"
-        value={affirmativeName}
-        onChange={e => setAffirmativeName(e.target.value)}
-        placeholder="Affirmative Name"
-      />
-
-      <input
-        className="border border-aqua rounded p-1 mr-2"
-        value={negativeName}
-        onChange={e => setNegativeName(e.target.value)}
-        placeholder="Negative Name"
-      />
+      <h3 className="text-2xl font-bold">Create a new debate for {currentEvent?.name}</h3>
 <div>
-<select
-  className="border border-aqua rounded p-1 mr-2"
-  value={selectedTopic ? selectedTopic.id : ''}
-  onChange={e => {
-    const selectedId = e.target.value;
-    setSelectedTopic(topics.find(topic => topic.id.toString() === selectedId) ?? null);
-  }}
->
-  <option value="">Select a topic</option>
-  {(topics || []).map(topic => (
-    <option key={topic.id} value={topic.id}>
-      {topic.topic_name}
-    </option>
-  ))}
-</select>
+      <select
+        className="border border-aqua rounded p-1 mr-2"
+        value={selectedAffirmative || ''}
+        onChange={e => setSelectedAffirmative(e.target.value)}
+      >
+        <option value="">Select Affirmative</option>
+        {profiles.map(profile => (
+          <option key={profile.id} value={profile.name}>
+            {profile.name}
+          </option>
+        ))}
+      </select>
 
-      <Button className="black rounded px-2 py-1" onClick={handleDebateSubmission}>Submit Debate</Button>
+      <select
+        className="border border-aqua rounded p-1 mr-2"
+        value={selectedNegative || ''}
+        onChange={e => setSelectedNegative(e.target.value)}
+      >
+        <option value="">Select Negative</option>
+        {profiles.map(profile => (
+          <option key={profile.id} value={profile.name}>
+            {profile.name}
+          </option>
+        ))}
+      </select>
       </div>
+      <div>
+        <select
+          className="border border-aqua rounded p-1 mr-2"
+          value={selectedTopic ? selectedTopic.id : ''}
+          onChange={e => {
+            const selectedId = e.target.value;
+            setSelectedTopic(topics.find(topic => topic.id.toString() === selectedId) ?? null);
+          }}
+        >
+          <option value="">Select a topic</option>
+          {(topics || []).map(topic => (
+            <option key={topic.id} value={topic.id}>
+              {topic.topic_name}
+            </option>
+          ))}
+        </select>
+
+        <Button className="black rounded px-2 py-1" onClick={handleDebateSubmission}>Submit Debate</Button>
+      </div>
+
       {showToast && (
         <Toast 
           message={toastMessage} 

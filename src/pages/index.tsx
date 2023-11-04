@@ -10,6 +10,8 @@ import EventCreation from './EventCreation';
 import DebateCreation from './DebateCreation';
 import TopicCreation from './TopicCreation';
 import React from 'react';
+import ProfileSetup from './ProfileSetup';
+import TopicVoting from './TopicVoting';
 
 interface Event {
   id: number;
@@ -54,6 +56,7 @@ export default function HomePage() {
   useEffect(() => {
     fetchTopicsForCurrentEvent();
   }, [currentEvent]);
+  
 
   const fetchEvents = async () => {
     const { data, error } = await supabase.from('events').select('*');
@@ -63,7 +66,7 @@ export default function HomePage() {
         name: item.name,
       }));
       setEvents(formattedData);
-      if (!currentEvent) {
+      if (!currentEvent && formattedData.length > 0) {
         setCurrentEvent(formattedData[0]);
       }
     }
@@ -89,7 +92,8 @@ export default function HomePage() {
     if (error) console.error('Error fetching topics:', error);
   }, [currentEvent, setTopics]);
 
-  const handleVote = async (topicId: number) => {
+  const handleVote = async (topicId: number): Promise<void> => {
+  
     const topicToUpdate = topics.find(t => t.id === topicId);
     if (!topicToUpdate) {
       console.error("No topic found with id:", topicId);
@@ -106,13 +110,19 @@ export default function HomePage() {
   };
 
   const handleCreateEvent = async () => {
-    const { data, error } = await supabase.from('events').insert([{ name: newEventName }]);
+    const { data: newEvent, error } = await supabase.from('events').insert([{ name: newEventName }]).single();
     if (error) {
       console.error('Error creating event:', error);
       return;
     }
-    if (data && (data as Array<any>).length > 0) {
-      setEvents(prevEvents => [...prevEvents, data[0]]);
+    if (newEvent) {
+      console.log('New event from Supabase:', newEvent);
+    console.log(newEvent); 
+    }
+    
+    if (newEvent) {
+      setEvents(prevEvents => [...prevEvents, newEvent]);
+      setCurrentEvent(newEvent); // Set the current event to the new event
       setNewEventName('');
     }
   };
@@ -120,22 +130,33 @@ export default function HomePage() {
   return (
     <div className="main-container text-aqua p-4">
       <div className='items-center flex justify-center margin-bt-30'>
-      <img src="super-debate-logo.png" alt="logo" width="200px"/>
+        <img src="super-debate-logo.png" alt="logo" width="200px"/>
       </div>
-      <h1 className="text-4xl font-bold text-center white-text">Welcome to the Super Debate App!</h1>
-      <div className='margin-bt-30 text-center white-text'>Easily utilize the Super Debate format. Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.</div>
+      <h1 className="text-4xl font-bold text-center white-text">Welcome to the Super Debate App</h1>
+      <div className='margin-bt-30 text-center white-text'>
+        Easily utilize the Super Debate format. Create events, submit and vote on topics, create debates on topics, and have judges submit their scores.
+      </div>
       {!user ? (
-        <><div className='text-center white-text'>Please sign in to continue.</div>
-        <div className="card">
-          <div className='auth-form-container'>
-          <Auth supabaseClient={supabase} providers={['google']} />
+        <>
+          <div className='text-center white-text'>Please sign in to continue.</div>
+          <div className="card">
+            <div className='auth-form-container'>
+              <Auth supabaseClient={supabase} providers={['google']} />
+            </div>
           </div>
-        </div></>
+        </>
       ) : (
         <>
+          <ProfileSetup supabase={supabase} user={user} />
           <div className="card">
-            <EventSelector events={events} currentEvent={currentEvent} onEventChange={setCurrentEvent} />
-            <div>-------------------</div>
+          <EventSelector
+    key={events.length}
+    events={events}
+    currentEvent={currentEvent}
+    onEventChange={setCurrentEvent}
+/>
+
+            <div className='solid-divide'></div>
             <div className="font-bold margin-top-10">Or create a new event</div>
             <EventCreation newEventName={newEventName} onEventNameChange={setNewEventName} onCreate={handleCreateEvent} />
           </div>
@@ -146,24 +167,12 @@ export default function HomePage() {
                 topics={topics}
                 onDebateCreation={newDebate => setDebates(prevDebates => [...prevDebates, newDebate as AppDebate])}
               />
-              <div className="mt-4 card">
-                <h3 className='mr-2 text-2xl font-bold m'>Submit a topic or vote for one</h3>
-                <TopicCreation
-                  currentEvent={currentEvent}
-                  topics={topics}
-                  onTopicCreation={newTopic => setTopics(prevTopics => [...prevTopics, newTopic])}
-                  onVote={handleVote}
-                />
-                <h3 className="text-l font-bold mt-4">Vote on submitted debate topics for {currentEvent.name}</h3>
-                <ul className="list-inside">
-                  {topics.map(topic => (
-                    <li key={topic.id} className="mt-2">
-                      <Button className="purple rounded px-2 py-1 ml-2" onClick={() => handleVote(topic.id)}>Vote</Button>
-                      <div className="inline-votes">{topic.topic_name} - Votes: {topic.votes}</div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+             <TopicVoting 
+            currentEvent={currentEvent}
+            topics={topics}
+            onTopicCreation={newTopic => setTopics(prevTopics => [...prevTopics, newTopic])}
+            onVote={handleVote}
+          />
               <DebateRating selectedEventId={currentEvent?.id} user={user} />
             </>
           )}
@@ -172,6 +181,10 @@ export default function HomePage() {
           </div>
         </>
       )}
+      <div className='text-center footer'>
+        © 2023 Super Debate, Inc. • Terms of Service
+      </div>
     </div>
   );
+  
 }

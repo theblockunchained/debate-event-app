@@ -122,65 +122,79 @@ function DebateRating({ selectedEventId, user }: DebateRatingProps) {
   };
 
   return (
-    <div className="card">
-        <h3 className='mr-2 text-2xl font-bold m'>Judge the debate round</h3>
-        <label>Select a debate to judge: </label>
-        <select className="border rounded p-1 mr-2" 
-            value={selectedDebate ? selectedDebate.id : ''} 
-            onChange={e => {
-                const selectedId = e.target.value;
-                setSelectedDebate(debates.find(debate => debate.id.toString() === selectedId) ?? null);
-            }}
-        >
-            <option value="">Select a debate </option>
-            {debates.map(debate => (
-                <option key={debate.id} value={debate.id}>
-                    {debate.affirmative_name} vs {debate.negative_name}
-                </option>
-            ))}
-        </select>
+<div className="card">
+    <h3 className='text-2xl font-bold'>Judge the debate round</h3>
+    <select className="border rounded p-1 mr-2 mb-4 md:w-auto"
+        value={selectedDebate ? selectedDebate.id : ''} 
+        onChange={e => {
+            const selectedId = e.target.value;
+            setSelectedDebate(debates.find(debate => debate.id.toString() === selectedId) ?? null);
+        }}
+    >
+        <option value="">Select debate</option>
+        {debates.map(debate => (
+            <option key={debate.id} value={debate.id}>
+                {debate.affirmative_name} vs {debate.negative_name}
+            </option>
+        ))}
+    </select>
 
-        <div className='margin-bt-15'>
-            <div>
-                Rate the debaters on the following criteria (7-10):
-            </div>
-            <div className='spacer-30'>
-                <div className='float-right'>Aff</div>
-                <div className='float-right'>Neg</div>
-            </div>
-            <div>
-                {criteria.map(criterion => (
-                    <div key={criterion.id}>
-                        <label>{criterion.name}: </label>
-                        <input className="rating-input"
-                            type="number" 
-                            min="7" 
-                            max="10" 
-                            value={criteriaScores[criterion.id].affirmative} 
+    <div className='mb-4'>
+    <table className="table-auto w-full mt-4">
+        <thead>
+            <tr>
+                <th className="border px-4 py-2">Rate debaters on the following criteria (7-10):</th>
+                <th className="border px-4 py-2 text-right font-bold">Aff</th>
+                <th className="border px-4 py-2 text-right font-bold">Neg</th>
+            </tr>
+        </thead>
+        <tbody>
+            {criteria.map(criterion => (
+                <tr key={criterion.id}>
+                    <td className="border px-4 py-2">
+                        <label>{criterion.name}:</label>
+                    </td>
+                    <td className="border px-4 py-2">
+                        <input
+                            className="rating-input w-full py-1 px-2 border rounded-md"
+                            type="number"
+                            min="7"
+                            max="10"
+                            value={criteriaScores[criterion.id].affirmative}
                             onChange={e => handleCriterionChange(e, criterion.id, 'affirmative')}
                         />
-                        <input className="rating-input"
-                            type="number" 
-                            min="7" 
-                            max="10" 
-                            value={criteriaScores[criterion.id].negative} 
+                    </td>
+                    <td className="border px-4 py-2">
+                        <input
+                            className="rating-input w-full py-1 px-2 border rounded-md"
+                            type="number"
+                            min="7"
+                            max="10"
+                            value={criteriaScores[criterion.id].negative}
                             onChange={e => handleCriterionChange(e, criterion.id, 'negative')}
                         />
-                    </div>
-                ))}
-            </div>
-        </div>
+                    </td>
+                </tr>
+            ))}
+        </tbody>
+    </table>
+</div>
 
-        <button className='black rounded px-2 py-1 ml-2' onClick={handleSubmit}>Submit Rating</button>
 
-        {showToast && (
-            <Toast 
-                message={toastMessage} 
-                type={toastType} 
-                onClose={closeToast}
-            />
-        )}
-    </div>
+    <button className='black rounded px-2 py-1 ml-2' onClick={handleSubmit}>Submit Rating</button>
+
+    {showToast && (
+        <Toast 
+            message={toastMessage} 
+            type={toastType} 
+            onClose={closeToast}
+        />
+    )}
+</div>
+
+
+
+
   );
 }
 

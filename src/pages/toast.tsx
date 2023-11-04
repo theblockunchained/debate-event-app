@@ -18,7 +18,7 @@ function Toast({ message, type, onClose }: ToastProps) {
                 {icon}
             </div>
             <div className="ml-3 text-sm font-normal">{message}</div>
-            <button onClick={onClose} className="ml-auto">X</button>
+            <a onClick={onClose} className="ml-auto">X</a>
         </div>
     );
 } 
